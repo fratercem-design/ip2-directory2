@@ -1,34 +1,36 @@
 
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { type NextRequest } from "next/server";
 
 export async function GET(request: NextRequest) {
     const { searchParams, origin } = new URL(request.url);
     const code = searchParams.get("code");
-    // if "next" is in param, use it as the redirect URL
     const next = searchParams.get("next") ?? "/";
 
-    if (code) {
-        const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-        );
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
-        if (!error) {
-            const forwardedHost = request.headers.get("x-forwarded-host"); // original origin before load balancer
-            const isLocalEnv = process.env.NODE_ENV === "development";
-            if (isLocalEnv) {
-                // we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-                return NextResponse.redirect(`${origin}${next}`);
-            } else if (forwardedHost) {
-                return NextResponse.redirect(`https://${forwardedHost}${next}`);
-            } else {
-                return NextResponse.redirect(`${origin}${next}`);
-            }
-        }
+    // Determine the correct base URL for redirects
+    const forwardedHost = request.headers.get("x-forwarded-host");
+    const isLocalEnv = process.env.NODE_ENV === "development";
+    let baseUrl = origin;
+
+    if (!isLocalEnv && forwardedHost) {
+        baseUrl = `https://${forwardedHost}`;
     }
 
-    // return the user to an error page with instructions
-    return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+    if (!code) {
+        const errUrl = new URL("/auth/auth-code-error", baseUrl);
+        errUrl.searchParams.set("error", "Missing auth code.");
+        return NextResponse.redirect(errUrl);
+    }
+
+    const supabase = await createSupabaseServerClient();
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) {
+        const errUrl = new URL("/auth/auth-code-error", baseUrl);
+        errUrl.searchParams.set("error", error.message);
+        return NextResponse.redirect(errUrl);
+    }
+
+    return NextResponse.redirect(`${baseUrl}${next}`);
 }
