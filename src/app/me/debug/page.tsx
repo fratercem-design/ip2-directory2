@@ -23,32 +23,66 @@ export default async function MeDebugPage() {
                         borderRadius: 8,
                         background: "rgba(0,0,0,0.06)",
                         overflowX: "auto",
+                        color: "red",
                     }}
                 >
                     Error: {error.message}
                 </pre>
             ) : null}
 
-            <pre
-                style={{
-                    padding: 12,
-                    borderRadius: 8,
-                    background: "rgba(0,0,0,0.06)",
-                    overflowX: "auto",
-                }}
-            >
-                {JSON.stringify(
-                    {
-                        authenticated: !!user,
-                        id: user?.id ?? null,
-                        email: user?.email ?? null,
-                        role,
-                        app_metadata: user?.app_metadata ?? null,
-                    },
-                    null,
-                    2
-                )}
-            </pre>
+            <div className="space-y-4">
+                <section>
+                    <h2 className="text-lg font-bold mb-2">User Identity</h2>
+                    <pre
+                        style={{
+                            padding: 12,
+                            borderRadius: 8,
+                            background: "rgba(0,0,0,0.06)",
+                            overflowX: "auto",
+                        }}
+                    >
+                        {JSON.stringify(
+                            {
+                                authenticated: !!user,
+                                id: user?.id ?? null,
+                                email: user?.email ?? null,
+                                role,
+                                last_sign_in_at: user?.last_sign_in_at ?? null,
+                            },
+                            null,
+                            2
+                        )}
+                    </pre>
+                </section>
+
+                <section>
+                    <h2 className="text-lg font-bold mb-2">App Metadata</h2>
+                    <pre
+                        style={{
+                            padding: 12,
+                            borderRadius: 8,
+                            background: "rgba(0,0,0,0.06)",
+                            overflowX: "auto",
+                        }}
+                    >
+                        {JSON.stringify(user?.app_metadata ?? {}, null, 2)}
+                    </pre>
+                </section>
+
+                <section>
+                    <h2 className="text-lg font-bold mb-2">User Metadata</h2>
+                    <pre
+                        style={{
+                            padding: 12,
+                            borderRadius: 8,
+                            background: "rgba(0,0,0,0.06)",
+                            overflowX: "auto",
+                        }}
+                    >
+                        {JSON.stringify(user?.user_metadata ?? {}, null, 2)}
+                    </pre>
+                </section>
+            </div>
         </div>
     );
 }
