@@ -1,7 +1,22 @@
 
 import { supabasePublic } from "@/lib/supabase/public";
 import Link from "next/link";
-import { Play } from "lucide-react";
+import { Heart } from "lucide-react";
+import { Metadata } from "next";
+import { StructuredData } from "@/components/structured-data";
+import { generateStructuredData } from "@/lib/seo";
+
+export const metadata: Metadata = {
+    title: "Cult of Psyche - Live Streams, Shadow Work, and Spiritual Community",
+    description: "Watch live streams, explore shadow work, join the spiritual community of Cult of Psyche. 24/7 YouTube Live Theater, divination, community discussions, and the path of transformation.",
+    keywords: ["Cult of Psyche", "live streams", "shadow work", "spiritual community", "YouTube live", "divination", "transformation"],
+    openGraph: {
+        title: "Cult of Psyche - Live Streams and Spiritual Community",
+        description: "Join the Cult of Psyche community for live streams, shadow work, divination, and authentic transformation.",
+        type: "website",
+        images: ["/og-image.jpg"]
+    }
+};
 
 // Helper to deduce embed URL and Chat URL
 function getEmbeds(session: any) {
@@ -26,19 +41,34 @@ function getEmbeds(session: any) {
         }
     }
 
-    // 2. FALLBACK / 24/7 VOD CASE
-    // Using "Lofi Girl - beats to relax/study to" (PL6NdkXsPL07KN01gH2vucWgLr2QPNnvty) as reliable demo.
-    // User should replace this.
-    const playlistId = "PL6NdkXsPL07KN01gH2vucWgLr2QPNnvty";
+    // 2. FALLBACK / 24/7 VOD CASE - YouTube Live Theater
+    // Playlist of lives and episodes that loops continuously
+    // Set this to your YouTube playlist ID containing your lives and episodes
+    const playlistId = process.env.NEXT_PUBLIC_YOUTUBE_PLAYLIST_ID || "PL6NdkXsPL07KN01gH2vucWgLr2QPNnvty";
 
+    // Enhanced YouTube embed for 24/7 theater mode
+    // Parameters:
+    // - listType=playlist: Specify this is a playlist
+    // - list=${playlistId}: Your playlist ID
+    // - autoplay=1: Start playing automatically
+    // - loop=1: Loop the entire playlist (requires playlist parameter)
+    // - playlist=${playlistId}: Required for loop to work with playlists
+    // - mute=0: Unmuted (change to 1 for muted)
+    // - controls=1: Show player controls
+    // - rel=0: Don't show related videos from other channels
+    // - modestbranding=1: Minimal YouTube branding
+    // - playsinline=1: Play inline on mobile
+    // - enablejsapi=1: Enable JavaScript API for advanced control
     return {
-        video: `https://www.youtube.com/embed?listType=playlist&list=${playlistId}&autoplay=1&mute=1`,
+        video: `https://www.youtube.com/embed?listType=playlist&list=${playlistId}&autoplay=1&loop=1&playlist=${playlistId}&mute=0&controls=1&rel=0&modestbranding=1&playsinline=1&enablejsapi=1&iv_load_policy=3`,
         chat: null,
         isLive: false
     };
 }
 
 export default async function Home() {
+    const organizationData = generateStructuredData("Organization", {});
+    const websiteData = generateStructuredData("WebSite", {});
     const db = supabasePublic();
 
     // 1. Fetch Cult of Psyche Streamer Data (Always)
@@ -102,7 +132,7 @@ export default async function Home() {
         } else {
             // Construct a "Offline" hero object
             heroSession = {
-                title: "Psycheverse 24/7 Radio",
+                title: "Cult of Psyche 24/7 Radio",
                 streamer: cop,
                 platform_account: account,
                 is_live: false
@@ -116,18 +146,34 @@ export default async function Home() {
     const embeds = getEmbeds(heroSession);
 
     return (
-        <main className="min-h-screen bg-black text-white">
+        <>
+            <StructuredData data={organizationData} />
+            <StructuredData data={websiteData} />
+            <main className="min-h-screen bg-black text-white">
             {heroSession ? (
                 // HERO MODE (Always Visible for Cult of Psyche)
                 <div className="w-full">
                     <div className={`grid grid-cols-1 ${embeds.chat ? 'lg:grid-cols-[1fr_350px]' : 'lg:grid-cols-1'} gap-0 h-[80vh] border-b border-zinc-800`}>
-                        <iframe
-                            src={embeds.video}
-                            className="w-full h-full"
-                            allow="autoplay; encrypted-media; fullscreen"
-                            allowFullScreen
-                            title="Main Stream"
-                        />
+                        <div className="relative w-full h-full bg-black">
+                            <iframe
+                                src={embeds.video}
+                                className="w-full h-full"
+                                allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+                                allowFullScreen
+                                title="Cult of Psyche Live Theater"
+                                id="youtube-theater-player"
+                            />
+                            {!embeds.isLive && (
+                                <div className="absolute top-4 left-4 bg-black/70 backdrop-blur-sm px-4 py-2 rounded-lg border border-zinc-700">
+                                    <p className="text-white text-sm font-medium">🎭 Live Theater Mode</p>
+                                    <p className="text-zinc-400 text-xs">24/7 Episodes & Lives</p>
+                                    {/* Hidden easter egg - select this text */}
+                                    <p className="text-transparent text-[2px] select-text hover:text-zinc-500 transition-colors cursor-default" title="Look closer...">
+                                        The truth is hidden in plain sight. Seek and you shall find.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
                         {embeds.chat && (
                             <iframe
                                 src={embeds.chat}
@@ -159,25 +205,36 @@ export default async function Home() {
                                             <span>{heroSession.viewer_count?.toLocaleString() || "0"} watching</span>
                                         </>
                                     ) : (
-                                        <span className="text-zinc-500 font-medium">📺 24/7 Broadcast</span>
+                                        <span className="text-zinc-500 font-medium">🎭 24/7 Live Theater</span>
                                     )}
                                     <span>•</span>
                                     <span className="font-bold text-white">{heroSession.streamer.display_name}</span>
                                 </div>
                             </div>
                         </div>
-                        <Link
-                            href={`/streamer/cult-of-psyche`}
-                            className="bg-white text-black font-bold px-6 py-2 rounded-full hover:scale-105 transition-transform"
-                        >
-                            View Profile
-                        </Link>
+                        <div className="flex items-center gap-3">
+                            <a
+                                href="https://cash.app/$psycheawakens"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-emerald-500 text-white font-bold px-4 py-2 rounded-full hover:scale-105 transition-transform"
+                            >
+                                <Heart className="h-4 w-4" />
+                                <span className="hidden sm:inline">Support</span>
+                            </a>
+                            <Link
+                                href={`/streamer/cult-of-psyche`}
+                                className="bg-white text-black font-bold px-6 py-2 rounded-full hover:scale-105 transition-transform"
+                            >
+                                View Profile
+                            </Link>
+                        </div>
                     </div>
                 </div>
             ) : (
                 // Use normal header if CoP data missing (fallback)
                 <header className="p-8 mb-8 flex items-center justify-between container mx-auto">
-                    <h1 className="text-3xl font-bold tracking-tight">Psycheverse Live Directory</h1>
+                    <h1 className="text-3xl font-bold tracking-tight">Cult of Psyche Live Directory</h1>
                     <div className="text-zinc-500 text-sm">
                         {gridSessions.length} active streams
                     </div>
@@ -189,8 +246,12 @@ export default async function Home() {
                 <h2 className="text-xl font-bold text-zinc-500 mb-6">Directory</h2>
 
                 {gridSessions.length === 0 ? (
-                    <div className="text-center py-12 text-zinc-500 border border-zinc-800 rounded-lg bg-zinc-900/20">
+                    <div className="text-center py-12 text-zinc-500 border border-zinc-800 rounded-lg bg-zinc-900/20 relative group">
                         No other signals detected.
+                        {/* Hidden message on hover */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
+                            <p className="text-zinc-600 text-xs font-mono">The void holds secrets...</p>
+                        </div>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -242,5 +303,6 @@ export default async function Home() {
                 )}
             </div>
         </main>
+        </>
     );
 }

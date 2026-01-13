@@ -6,7 +6,7 @@ import { z } from "zod";
 
 const schema = z.object({
     streamer_id: z.string().uuid(),
-    platform: z.enum(["twitch", "youtube", "kick"]),
+    platform: z.enum(["twitch", "youtube", "kick", "tiktok", "twitter", "instagram"]),
     platform_user_id: z.string().min(1),
     platform_username: z.string().optional(),
     channel_url: z.string().optional(),
@@ -26,7 +26,8 @@ export async function POST(req: Request) {
         if (error) throw error;
         return NextResponse.json({ data });
 
-    } catch (e: any) {
-        return NextResponse.json({ error: e.message || "Invalid Request" }, { status: 400 });
+    } catch (e) {
+        const error = e instanceof Error ? e.message : "Invalid Request";
+        return NextResponse.json({ error }, { status: 400 });
     }
 }

@@ -32,7 +32,8 @@ export async function POST(req: Request) {
         if (error) throw error;
         return NextResponse.json({ data });
 
-    } catch (e: any) {
-        return NextResponse.json({ error: e.message || "Invalid Request" }, { status: 400 });
+    } catch (e) {
+        const error = e instanceof Error ? e.message : "Invalid Request";
+        return NextResponse.json({ error }, { status: 400 });
     }
 }

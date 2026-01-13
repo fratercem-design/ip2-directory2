@@ -5,6 +5,9 @@ import type { AccountDue, LiveSnapshot } from "@/lib/platforms/types";
 import { fetchTwitchLive } from "@/lib/platforms/twitch";
 import { fetchYouTubeLive } from "@/lib/platforms/youtube";
 import { fetchKickLive } from "@/lib/platforms/kick";
+import { fetchTikTokLive } from "@/lib/platforms/tiktok";
+import { fetchTwitterLive } from "@/lib/platforms/twitter";
+import { fetchInstagramLive } from "@/lib/platforms/instagram";
 
 function jitterSeconds(base: number, spread: number) {
     const delta = Math.floor((Math.random() * 2 - 1) * spread);
@@ -38,16 +41,22 @@ export const pollPlatformAccounts = inngest.createFunction(
         }, {});
 
         // 3) batched fetch
-        const [twitchRes, ytRes, kickRes] = await Promise.all([
+        const [twitchRes, ytRes, kickRes, tiktokRes, twitterRes, instagramRes] = await Promise.all([
             fetchTwitchLive(byPlatform.twitch ?? []),
             fetchYouTubeLive(byPlatform.youtube ?? []),
             fetchKickLive(byPlatform.kick ?? []),
+            fetchTikTokLive(byPlatform.tiktok ?? []),
+            fetchTwitterLive(byPlatform.twitter ?? []),
+            fetchInstagramLive(byPlatform.instagram ?? []),
         ]);
 
         const snapshots: Record<string, LiveSnapshot> = {
             ...twitchRes.byPlatformUserId,
             ...ytRes.byPlatformUserId,
             ...kickRes.byPlatformUserId,
+            ...tiktokRes.byPlatformUserId,
+            ...twitterRes.byPlatformUserId,
+            ...instagramRes.byPlatformUserId,
         };
 
         // 4) process each account (idempotent via “one active session” constraint)

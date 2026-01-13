@@ -15,7 +15,7 @@ async function fetchKickChannel(slug: string): Promise<LiveSnapshot | null> {
         const res = await fetch(`https://kick.com/api/v1/channels/${slug}`, {
             next: { revalidate: 0 }, // No cache
             headers: {
-                "User-Agent": "Psycheverse/1.0 (Compatible; +https://psycheverse.org)"
+                "User-Agent": "Cult of Psyche/1.0 (Compatible; +https://cultofpsyche.org)"
             }
         });
 

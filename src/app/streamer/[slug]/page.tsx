@@ -1,7 +1,7 @@
 import { supabasePublic } from "@/lib/supabase/public";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Twitch, Youtube, Video } from "lucide-react";
+import { ArrowLeft, Twitch, Youtube, Video, Heart, ShoppingBag, ExternalLink } from "lucide-react";
 import { FollowButton } from "@/components/streamer/follow-button";
 import { ClipButton } from "@/components/streamer/clip-button";
 
@@ -10,6 +10,9 @@ const PlatformIcon = ({ p }: { p: string }) => {
     switch (p) {
         case 'twitch': return <Twitch className="h-4 w-4" />;
         case 'youtube': return <Youtube className="h-4 w-4" />;
+        case 'tiktok': return <Video className="h-4 w-4" />; // TikTok icon placeholder
+        case 'twitter': return <Video className="h-4 w-4" />; // Twitter/X icon placeholder
+        case 'instagram': return <Video className="h-4 w-4" />; // Instagram icon placeholder
         default: return <Video className="h-4 w-4" />;
     }
 };
@@ -112,6 +115,33 @@ export default async function StreamerProfile({ params }: { params: { slug: stri
                             ))}
                         </div>
                     </div>
+
+                    {/* Support Section */}
+                    {slug === "cult-of-psyche" && (
+                        <div className="space-y-3 pt-4 border-t border-zinc-800">
+                            <h3 className="text-sm font-bold text-zinc-500 uppercase tracking-widest">Support</h3>
+                            <a
+                                href="https://cash.app/$psycheawakens"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-3 p-3 rounded bg-gradient-to-r from-emerald-600/20 to-emerald-500/20 hover:from-emerald-600/30 hover:to-emerald-500/30 transition-colors border border-emerald-700/50 hover:border-emerald-600"
+                            >
+                                <Heart className="h-4 w-4 text-emerald-400" />
+                                <span className="text-white font-medium">Cash App</span>
+                                <span className="text-emerald-400 text-sm ml-auto font-mono">$psycheawakens</span>
+                            </a>
+                            <a
+                                href="https://psycheawakens.etsy.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-3 p-3 rounded bg-gradient-to-r from-orange-600/20 to-red-500/20 hover:from-orange-600/30 hover:to-red-500/30 transition-colors border border-orange-700/50 hover:border-orange-600"
+                            >
+                                <ShoppingBag className="h-4 w-4 text-orange-400" />
+                                <span className="text-white font-medium">Etsy Shop</span>
+                                <ExternalLink className="h-3 w-3 text-orange-400 ml-auto" />
+                            </a>
+                        </div>
+                    )}
                 </div>
 
                 {/* Main Content / Live Status */}

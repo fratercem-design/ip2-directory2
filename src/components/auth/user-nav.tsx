@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { supabasePublic } from "@/lib/supabase/public";
 import Link from "next/link";
 import { User, LogOut } from "lucide-react";
+import { TokenDisplay } from "@/components/tokens/token-display";
 
 export function UserNav() {
     const [user, setUser] = useState<any>(null);
@@ -38,12 +39,13 @@ export function UserNav() {
 
     return (
         <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
+            <TokenDisplay compact />
+            <Link href="/me" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                 <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-xs">
                     {user.email?.substring(0, 2).toUpperCase()}
                 </div>
                 <span className="text-sm font-medium text-zinc-300 hidden md:block">{user.email}</span>
-            </div>
+            </Link>
             <button
                 onClick={() => db.auth.signOut()}
                 className="text-zinc-400 hover:text-white p-2"

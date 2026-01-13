@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 
 const { createClient } = require('@supabase/supabase-js');
 const { google } = require('googleapis');
@@ -16,7 +17,7 @@ async function fixAndFetch() {
     const { data: updateData, error: updateError } = await db
         .from("platform_accounts")
         .update({ platform_user_id: CORRECT_ID })
-        .eq("platform_username", "CultofPsyche") // Ensure we target the right row
+        .eq("platform_username", "cultofpsyche") // Ensure we target the right row
         .eq("platform", "youtube")
         .select()
         .single();

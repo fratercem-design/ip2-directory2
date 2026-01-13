@@ -38,11 +38,14 @@ export function GlobalLiveBanner() {
                 // Determine URL
                 // The shape of data will be nested arrays because of !inner joins usually returning arrays
                 // Actually with single() on top it might be clean, but let's safely access.
-                const accounts = data.platform_accounts as any[];
-                const sessions = accounts?.[0]?.live_sessions as any[];
-                if (sessions?.[0]?.is_live) {
+                interface PlatformAccount {
+                    live_sessions?: Array<{ is_live: boolean; stream_url?: string }>;
+                }
+                const accounts = (data.platform_accounts || []) as PlatformAccount[];
+                const sessions = accounts[0]?.live_sessions || [];
+                if (sessions[0]?.is_live) {
                     setIsLive(true);
-                    setStreamUrl(sessions[0].stream_url);
+                    setStreamUrl(sessions[0].stream_url || "");
                 }
             } else {
                 setIsLive(false);

@@ -30,8 +30,9 @@ export default function AdminPage() {
             if (!res.ok) throw new Error(json.error);
             setStatus(`Created Streamer: ${json.data.slug} (${json.data.id})`);
             setAStreamerId(json.data.id); // Auto-fill for next step
-        } catch (e: any) {
-            setStatus(`Error: ${e.message}`);
+        } catch (e) {
+            const error = e instanceof Error ? e.message : String(e);
+            setStatus(`Error: ${error}`);
         }
     }
 
@@ -51,8 +52,9 @@ export default function AdminPage() {
             const json = await res.json();
             if (!res.ok) throw new Error(json.error);
             setStatus(`Created Account for ${aPlatform}`);
-        } catch (e: any) {
-            setStatus(`Error: ${e.message}`);
+        } catch (e) {
+            const error = e instanceof Error ? e.message : String(e);
+            setStatus(`Error: ${error}`);
         }
     }
 
@@ -91,6 +93,9 @@ export default function AdminPage() {
                         <option value="twitch">Twitch</option>
                         <option value="kick">Kick</option>
                         <option value="youtube">YouTube</option>
+                        <option value="tiktok">TikTok</option>
+                        <option value="twitter">Twitter/X</option>
+                        <option value="instagram">Instagram</option>
                     </select>
                     <input className="w-full bg-zinc-900 border border-zinc-800 p-2 rounded" placeholder="Platform User ID (Channel ID)" value={aId} onChange={e => setAId(e.target.value)} />
                     <input className="w-full bg-zinc-900 border border-zinc-800 p-2 rounded" placeholder="Platform Username (Optional)" value={aUsername} onChange={e => setAUsername(e.target.value)} />

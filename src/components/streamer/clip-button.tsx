@@ -61,6 +61,23 @@ export function ClipButton({
 
             if (!res.ok) throw new Error(json.error);
 
+            // Award tokens for creating clip
+            try {
+                await fetch("/api/tokens/earn", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        amount: 15,
+                        transaction_type: "earn_create_clip",
+                        description: `Clipped: ${title}`,
+                        metadata: { clip_id: json.data?.id, streamer_id: streamerId, live_session_id: liveSessionId }
+                    })
+                });
+            } catch (tokenError) {
+                console.error("Failed to award tokens:", tokenError);
+                // Don't fail the clip if token award fails
+            }
+
             setStatus("success");
             setTimeout(() => setStatus("idle"), 3000); // Reset after 3s
 

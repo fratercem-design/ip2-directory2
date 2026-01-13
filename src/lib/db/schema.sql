@@ -18,7 +18,7 @@ create table if not exists public.streamers (
 create table if not exists public.platform_accounts (
   id uuid primary key default gen_random_uuid(),
   streamer_id uuid not null references public.streamers(id) on delete cascade,
-  platform text not null check (platform in ('youtube','twitch','kick')),
+  platform text not null check (platform in ('youtube','twitch','kick','tiktok','twitter','instagram')),
   platform_user_id text not null, -- Normalized ID (e.g. channel ID)
   platform_username text, 
   channel_url text,

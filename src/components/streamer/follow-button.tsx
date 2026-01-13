@@ -57,6 +57,25 @@ export function FollowButton({ streamerId }: { streamerId: string }) {
                 .from("follows")
                 .insert({ streamer_id: streamerId, user_id: userId });
             error = e;
+
+            // Award tokens for following
+            if (!e) {
+                try {
+                    await fetch("/api/tokens/earn", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                            amount: 25,
+                            transaction_type: "earn_follow_streamer",
+                            description: "Followed a streamer",
+                            metadata: { streamer_id: streamerId }
+                        })
+                    });
+                } catch (tokenError) {
+                    console.error("Failed to award tokens:", tokenError);
+                    // Don't fail the follow if token award fails
+                }
+            }
         }
 
         if (error) {

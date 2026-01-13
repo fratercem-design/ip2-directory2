@@ -1,5 +1,5 @@
 
-export type Platform = "twitch" | "youtube" | "kick";
+export type Platform = "twitch" | "youtube" | "kick" | "tiktok" | "twitter" | "instagram";
 
 export type AccountDue = {
     id: string;

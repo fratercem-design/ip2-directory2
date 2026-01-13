@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 
 const { createClient } = require('@supabase/supabase-js');
 
@@ -8,13 +9,13 @@ async function forceOffline() {
 
     const db = createClient(URL, KEY, { auth: { persistSession: false, autoRefreshToken: false } });
 
-    console.log("Searching for account 'CultofPsyche'...");
+    console.log("Searching for account 'cultofpsyche'...");
 
     // 1. Find Account by Username
     const { data: accounts, error: findError } = await db
         .from("platform_accounts")
         .select("id, platform_user_id")
-        .eq("platform_username", "CultofPsyche");
+        .eq("platform_username", "cultofpsyche");
 
     if (findError) {
         console.error("Find Error:", findError);
@@ -22,7 +23,7 @@ async function forceOffline() {
     }
 
     if (!accounts || accounts.length === 0) {
-        console.log("Account not found via username 'CultofPsyche'.");
+        console.log("Account not found via username 'cultofpsyche'.");
         return;
     }
 
